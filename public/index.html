@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ee">
+  <meta name="description" content="Um jogo casual de palavras. Descubra a resposta por meio de palpites e proximidade semântica.">
+  <title>CaçaPalavra — prática livre</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="CaçaPalavra, início">
+        <span class="brand-mark" aria-hidden="true">C</span>
+        <span class="brand-name">CaçaPalavra</span>
+      </a>
+      <div class="top-meta">
+        <span class="practice-pill">Prática livre</span>
+        <span class="no-account">Sem conta. Sem pressa.</span>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Um jogo de associações</p>
+        <h1 id="page-title">Chegue mais perto.</h1>
+        <p class="intro-copy">Descubra a palavra secreta com palpites e pistas de significado. Cada tentativa ajuda — e você pode jogar quantas vezes quiser.</p>
+      </section>
+
+      <div class="game-layout">
+        <section class="panel play-panel" aria-label="Partida de prática">
+          <div class="game-topline">
+            <div class="round-name"><span class="round-icon" aria-hidden="true">✳</span><span>Palavra de prática</span></div>
+            <div class="attempt-count" id="attempt-count" aria-live="polite">0 palpites</div>
+          </div>
+
+          <div class="game-body">
+            <p class="prompt-line"><span aria-hidden="true">✦</span>Qual palavra vem à sua cabeça?</p>
+            <p class="prompt-help">Digite uma palavra em português. O ranking mostra o quanto ela se aproxima da resposta.</p>
+            <form class="guess-form" id="guess-form" novalidate>
+              <div class="input-wrap">
+                <label class="sr-only" for="guess-input">Seu palpite</label>
+                <input class="guess-input" id="guess-input" name="guess" type="text" maxlength="48" autocomplete="off" autocapitalize="sentences" placeholder="Ex.: natureza" aria-describedby="input-note">
+              </div>
+              <button class="primary-button" id="submit-button" type="submit">Enviar palpite <span aria-hidden="true">→</span></button>
+            </form>
+            <p class="form-note" id="input-note">Pressione <strong>Enter</strong> para enviar. Tentativas ilimitadas.</p>
+            <button class="retry-button" id="retry-game" type="button" hidden>Tentar carregar uma partida novamente</button>
+          </div>
+
+          <section class="victory-panel" id="victory-panel" aria-labelledby="victory-title" hidden>
+            <div class="victory-top">
+              <span class="victory-star" aria-hidden="true">✦</span>
+              <div><h2 id="victory-title">Boa! Palavra encontrada.</h2><p id="victory-count">Partida concluída.</p></div>
+            </div>
+            <p class="revealed-answer" id="revealed-answer"></p>
+            <button class="primary-button new-game" id="new-game" type="button">Começar nova partida <span aria-hidden="true">↗</span></button>
+          </section>
+
+          <section class="history" aria-labelledby="history-title">
+            <div class="history-head">
+              <h2 id="history-title">Seus palpites</h2>
+              <span class="sort-note">Mais recente primeiro</span>
+            </div>
+            <ol class="history-list" id="history-list" aria-label="Histórico de palpites"></ol>
+            <p class="empty-state" id="empty-state"><strong>Seu histórico começa aqui.</strong><br>Envie um palpite para ver o ranking e acompanhar sua descoberta.</p>
+            <div class="history-foot"><span aria-hidden="true">♧</span>Palpites repetidos não entram duas vezes no histórico.</div>
+          </section>
+        </section>
+
+        <aside class="side-column" aria-label="Ajuda para jogar">
+          <section class="panel guide-panel" aria-labelledby="guide-title">
+            <div class="card-heading"><span class="card-icon" aria-hidden="true">↗</span><h2 id="guide-title">Como funciona</h2></div>
+            <p class="guide-copy">Cada palavra recebe uma posição no ranking. <strong>Quanto menor o número, mais perto do significado.</strong> A resposta certa fica em 1º lugar. Pense em ideias relacionadas, não em letras.</p>
+            <div class="rank-key" aria-label="Faixas ilustrativas do ranking">
+              <div class="key-row"><span class="key-swatch close" aria-hidden="true"></span><span>1 · Resposta encontrada</span></div>
+              <div class="key-row"><span class="key-swatch warm" aria-hidden="true"></span><span>2–15 · Muito perto ou quente</span></div>
+              <div class="key-row"><span class="key-swatch mild" aria-hidden="true"></span><span>16–30 · Morno</span></div>
+              <div class="key-row"><span class="key-swatch far" aria-hidden="true"></span><span>31+ · Distante</span></div>
+            </div>
+          </section>
+
+          <section class="panel examples-panel" aria-labelledby="examples-title">
+            <div class="card-heading"><span class="card-icon" aria-hidden="true">▤</span><h2 id="examples-title">Experimente</h2></div>
+            <p class="examples-intro">O vocabulário inicial é curado. Toque num exemplo para testar o ranking.</p>
+            <div class="example-list">
+              <button class="example-chip" type="button" data-guess="floresta">floresta</button>
+              <button class="example-chip" type="button" data-guess="água">água</button>
+              <button class="example-chip" type="button" data-guess="amizade">amizade</button>
+              <button class="example-chip" type="button" data-guess="melodia">melodia</button>
+              <button class="example-chip" type="button" data-guess="natureza">natureza</button>
+            </div>
+          </section>
+        </aside>
+      </div>
+      <p class="footer-note"><span aria-hidden="true">♧</span>Jogue no seu ritmo. Sem limite de palpites, sem cronômetro e sem cadastro.</p>
+      <p class="sr-only" id="live-message" aria-live="polite" aria-atomic="true"></p>
+    </main>
+  </div>
+</body>
+</html>

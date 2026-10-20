@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>CaçaPalavra — prática acessível</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f1f5f9;
+      color: #172033;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --ink: #172033;
+      --muted: #46536a;
+      --line: #cbd5e1;
+      --paper: #fff;
+      --navy: #111827;
+      --blue: #1648b5;
+      --blue-dark: #123b91;
+      --mint: #d9f5e8;
+      --mint-ink: #14532d;
+      --amber: #fff0c2;
+      --amber-ink: #713f12;
+      --rose: #ffe1dc;
+      --rose-ink: #7f1d1d;
+      --focus: #f2a900;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .skip-link {
+      position: absolute;
+      z-index: 2;
+      top: .75rem;
+      left: .75rem;
+      padding: .7rem 1rem;
+      transform: translateY(-180%);
+      border-radius: .5rem;
+      background: #fff;
+      color: var(--navy);
+      font-weight: 750;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 2px var(--navy);
+    }
+
+    .topbar {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .topbar-inner, main, .footer-inner {
+      width: min(100% - 2rem, 1060px);
+      margin-inline: auto;
+    }
+
+    .topbar-inner {
+      display: flex;
+      min-height: 76px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid #8ca9e6;
+      border-radius: 13px;
+      background: #263b66;
+      font-size: 1.25rem;
+    }
+
+    .practice-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      min-height: 40px;
+      padding: .4rem .8rem;
+      border: 1px solid #8ca9e6;
+      border-radius: 999px;
+      color: #fff;
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .practice-pill span:first-child { color: #9de2b9; }
+
+    main { padding-block: 2.5rem 4rem; }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, .62fr);
+      align-items: end;
+      gap: 2rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .eyebrow {
+      margin: 0 0 .45rem;
+      color: var(--blue-dark);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, p { margin-top: 0; }
+    h1 {
+      max-width: 650px;
+      margin-bottom: .65rem;
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+
+    .intro-copy {
+      max-width: 620px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .rule-card {
+      padding: 1rem 1.1rem;
+      border: 1px solid #9ab4e9;
+      border-radius: 14px;
+      background: #eaf0ff;
+      color: #182e5b;
+    }
+
+    .rule-card strong { display: block; margin-bottom: .25rem; }
+    .rule-card p { margin: 0; font-size: .95rem; }
+
+    .game-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--paper);
+      box-shadow: 0 14px 38px rgb(23 32 51 / 8%);
+    }
+
+    .game-heading {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.5rem 1.6rem 1.2rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .game-heading h2 {
+      margin-bottom: .3rem;
+      font-size: 1.25rem;
+      letter-spacing: -.02em;
+    }
+
+    .game-heading p { margin: 0; color: var(--muted); }
+
+    .attempt-count {
+      flex: 0 0 auto;
+      padding: .42rem .7rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #263247;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+
+    .game-body { padding: 1.5rem 1.6rem 1.75rem; }
+
+    .guess-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: .75rem;
+    }
+
+    .field { min-width: 0; }
+
+    label {
+      display: block;
+      margin-bottom: .4rem;
+      font-weight: 750;
+    }
+
+    input {
+      width: 100%;
+      min-height: 54px;
+      padding: .7rem .9rem;
+      border: 2px solid #64748b;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 1.05rem;
+    }
+
+    input::placeholder { color: #596579; opacity: 1; }
+    input:focus-visible { border-color: var(--blue); }
+    input:disabled { background: #f1f5f9; color: #46536a; }
+
+    .hint {
+      margin: .4rem 0 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      padding: .7rem 1.1rem;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 800;
+      text-align: center;
+      transition: background-color .15s ease, transform .15s ease;
+    }
+
+    .button:hover:not(:disabled) { background: var(--blue-dark); }
+    .button:active:not(:disabled) { transform: translateY(1px); }
+    .button:disabled { cursor: not-allowed; opacity: .65; }
+
+    .live-message {
+      min-height: 3rem;
+      margin: 1rem 0 0;
+      padding: .65rem .8rem;
+      border-left: 4px solid #64748b;
+      border-radius: 5px;
+      background: #f1f5f9;
+      color: var(--ink);
+    }
+
+    .live-message:empty { visibility: hidden; }
+    .live-message[data-kind="error"] {
+      border-left-color: #a12a1f;
+      background: var(--rose);
+      color: var(--rose-ink);
+    }
+    .live-message[data-kind="success"] {
+      border-left-color: #16814a;
+      background: var(--mint);
+      color: var(--mint-ink);
+    }
+
+    .history-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 1.6rem 0 .75rem;
+    }
+
+    .history-heading h3 { margin: 0; font-size: 1.05rem; }
+    .history-heading p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+    .guess-list {
+      display: grid;
+      gap: .65rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .guess-item {
+      display: grid;
+      grid-template-columns: minmax(90px, .72fr) minmax(0, 1.5fr) minmax(130px, 1fr);
+      align-items: center;
+      gap: 1rem;
+      min-height: 76px;
+      padding: .8rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .rank-block { display: flex; align-items: baseline; gap: .35rem; }
+    .rank-number { font-size: 1.25rem; font-weight: 850; letter-spacing: -.03em; }
+    .rank-caption { color: var(--muted); font-size: .8rem; }
+    .guess-word { overflow-wrap: anywhere; font-size: 1.05rem; font-weight: 750; }
+
+    .proximity {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 44px;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .proximity-label {
+      display: block;
+      margin-bottom: .25rem;
+      font-size: .88rem;
+      font-weight: 800;
+    }
+
+    .signal {
+      display: block;
+      height: 9px;
+      overflow: hidden;
+      border: 1px solid #475569;
+      border-radius: 99px;
+      background: #e2e8f0;
+    }
+
+    .signal-fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: #315fc3;
+    }
+
+    .guess-item[data-level="near"] .signal-fill { background: #167346; }
+    .guess-item[data-level="warm"] .signal-fill { background: #8a5700; }
+    .signal-caption {
+      color: var(--muted);
+      font-size: .75rem;
+      text-align: right;
+    }
+
+    .empty-state {
+      padding: 1.2rem;
+      border: 1px dashed #8b98aa;
+      border-radius: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .empty-state p { margin: 0; }
+
+    .win-panel {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #2d8050;
+      border-radius: 12px;
+      background: var(--mint);
+      color: var(--mint-ink);
+    }
+
+    .win-panel[data-visible="true"] { display: block; }
+    .win-panel h3 { margin-bottom: .25rem; }
+    .win-panel p { margin-bottom: .85rem; }
+    .win-panel .button { background: #14532d; }
+    .win-panel .button:hover { background: #0f3e22; }
+
+    .access-notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .access-note {
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .access-note h2 { margin-bottom: .3rem; font-size: .98rem; }
+    .access-note p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: #e8edf4;
+      color: #38465b;
+    }
+
+    .footer-inner { padding-block: 1.1rem 1.5rem; font-size: .88rem; }
+    .footer-inner p { margin: 0; }
+
+    @media (max-width: 700px) {
+      .intro { grid-template-columns: 1fr; gap: 1rem; }
+      .rule-card { max-width: 560px; }
+      .access-notes { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .topbar-inner, main, .footer-inner { width: min(100% - 1.25rem, 1060px); }
+      .topbar-inner { min-height: 68px; }
+      .practice-pill { padding-inline: .6rem; font-size: .82rem; }
+      main { padding-block: 1.7rem 2.5rem; }
+      .game-heading { padding: 1.15rem 1rem 1rem; }
+      .game-heading p { font-size: .92rem; }
+      .game-body { padding: 1rem; }
+      .guess-form { grid-template-columns: 1fr; }
+      .guess-form .button { width: 100%; }
+      .history-heading { align-items: start; flex-direction: column; gap: .15rem; }
+      .guess-item {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: .55rem .75rem;
+        padding: .8rem;
+      }
+      .rank-block { grid-column: 1; grid-row: 1; }
+      .guess-word { grid-column: 1; grid-row: 2; }
+      .proximity { grid-column: 2; grid-row: 1 / span 2; min-width: 112px; }
+      .attempt-count { font-size: .82rem; }
+    }
+
+    @media (max-width: 360px) {
+      .brand { gap: .45rem; font-size: 1rem; }
+      .brand-mark { width: 38px; height: 38px; }
+      .practice-pill { gap: .3rem; font-size: .76rem; }
+      .proximity { min-width: 96px; grid-template-columns: minmax(0, 1fr) 36px; }
+      .game-heading { gap: .5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o jogo</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#conteudo" aria-label="CaçaPalavra — início">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>CaçaPalavra</span>
+      </a>
+      <div class="practice-pill"><span aria-hidden="true">●</span><span>Prática ilimitada</span></div>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="intro" aria-labelledby="titulo">
+      <div>
+        <p class="eyebrow">Jogo de palavras · pt-BR</p>
+        <h1 id="titulo">Encontre a palavra pelo significado.</h1>
+        <p class="intro-copy">Envie um palpite e use a posição no ranking para chegar mais perto. Você pode tentar quantas vezes quiser.</p>
+      </div>
+      <aside class="rule-card" aria-label="Como interpretar o ranking">
+        <strong>Como ler o resultado</strong>
+        <p>Quanto menor a posição, mais próximo do significado. A posição, o rótulo e a barra mostram a mesma pista por meios diferentes.</p>
+      </aside>
+    </section>
+
+    <section class="game-card" aria-labelledby="partida-titulo">
+      <div class="game-heading">
+        <div>
+          <h2 id="partida-titulo">Sua palavra de prática</h2>
+          <p>Sem cronômetro e sem limite de palpites.</p>
+        </div>
+        <span class="attempt-count" id="attempt-count">0 palpites</span>
+      </div>
+
+      <div class="game-body">
+        <form class="guess-form" id="guess-form" novalidate>
+          <div class="field">
+            <label for="guess">Qual é o seu palpite?</label>
+            <input id="guess" name="guess" type="text" maxlength="60" autocomplete="off" autocapitalize="sentences" spellcheck="false" aria-describedby="guess-hint" placeholder="Digite uma palavra">
+            <p class="hint" id="guess-hint">Pressione Enter ou use o botão Enviar palpite.</p>
+          </div>
+          <button class="button" id="submit-guess" type="submit">Enviar palpite <span aria-hidden="true">→</span></button>
+        </form>
+
+        <p class="live-message" id="game-status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+        <div class="history-heading">
+          <h3 id="history-title">Histórico de palpites</h3>
+          <p>Posição 1 significa que você encontrou a resposta.</p>
+        </div>
+        <ol class="guess-list" id="guess-list" aria-labelledby="history-title"></ol>
+        <div class="empty-state" id="empty-state">
+          <p>Seus palpites aparecerão aqui, do mais recente ao mais antigo.</p>
+        </div>
+
+        <section class="win-panel" id="win-panel" aria-labelledby="win-title" data-visible="false">
+          <h3 id="win-title">Palavra encontrada!</h3>
+          <p id="win-message"></p>
+          <button class="button" id="new-game" type="button">Começar outra palavra</button>
+        </section>
+      </div>
+    </section>
+
+    <section class="access-notes" aria-label="Recursos de acessibilidade">
+      <article class="access-note">
+        <h2>Use só o teclado</h2>
+        <p>Tab navega pelos controles, Enter envia o palpite e o foco está sempre destacado.</p>
+      </article>
+      <article class="access-note">
+        <h2>Feedback sem depender da cor</h2>
+        <p>Cada resultado combina posição numérica, rótulo por extenso e sinal visual.</p>
+      </article>
+      <article class="access-note">
+        <h2>Confortável em qualquer tela</h2>
+        <p>O conteúdo se reorganiza em telas estreitas e respeita a preferência por menos movimento.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <p>Protótipo interativo: posições e rótulos são exemplos para demonstrar a experiência.</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const rounds = [
+        {
+          answer: "girassol",
+          ranks: { flor: 18, pétala: 31, jardim: 54, planta: 93, sol: 166, semente: 241, oceano: 1840 }
+        },
+        {
+          answer: "oceano",
+          ranks: { mar: 12, praia: 29, onda: 46, água: 72, barco: 183, areia: 246, girassol: 1960 }
+        },
+        {
+          answer: "bicicleta",
+          ranks: { pedal: 16, bicicleta: 1, roda: 38, capacete: 69, estrada: 112, carro: 208, girassol: 1750 }
+        }
+      ];
+
+      const form = document.querySelector("#guess-form");
+      const input = document.querySelector("#guess");
+      const status = document.querySelector("#game-status");
+      const list = document.querySelector("#guess-list");
+      const emptyState = document.querySelector("#empty-state");
+      const attemptCount = document.querySelector("#attempt-count");
+      const submitButton = document.querySelector("#submit-guess");
+      const winPanel = document.querySelector("#win-panel");
+      const winMessage = document.querySelector("#win-message");
+      const newGameButton = document.querySelector("#new-game");
+      let roundIndex = 0;
+      let guesses = new Set();
+
+      function normalize(value) {
+        return value.trim().normalize("NFC").toLocaleLowerCase("pt-BR");
+      }
+
+      function rankFor(guess, round) {
+        if (guess === round.answer) return 1;
+        if (Object.prototype.hasOwnProperty.call(round.ranks, guess)) return round.ranks[guess];
+        let hash = 0;
+        for (const character of guess) hash = (hash * 31 + character.codePointAt(0)) % 997;
+        return 260 + hash;
+      }
+
+      function labelFor(rank) {
+        if (rank === 1) return { text: "Resposta encontrada", level: "near", width: 100 };
+        if (rank <= 50) return { text: "Muito perto", level: "near", width: 88 };
+        if (rank <= 150) return { text: "Perto", level: "warm", width: 64 };
+        if (rank <= 500) return { text: "No caminho", level: "warm", width: 42 };
+        return { text: "Distante", level: "far", width: 18 };
+      }
+
+      function updateCount() {
+        const count = guesses.size;
+        attemptCount.textContent = `${count} ${count === 1 ? "palpite" : "palpites"}`;
+      }
+
+      function addResult(guess, rank) {
+        const label = labelFor(rank);
+        const item = document.createElement("li");
+        item.className = "guess-item";
+        item.dataset.level = label.level;
+
+        const rankBlock = document.createElement("div");
+        rankBlock.className = "rank-block";
+        const rankNumber = document.createElement("span");
+        rankNumber.className = "rank-number";
+        rankNumber.textContent = `#${rank.toLocaleString("pt-BR")}`;
+        const rankCaption = document.createElement("span");
+        rankCaption.className = "rank-caption";
+        rankCaption.textContent = "posição";
+        rankBlock.append(rankNumber, rankCaption);
+
+        const word = document.createElement("span");
+        word.className = "guess-word";
+        word.textContent = guess;
+
+        const proximity = document.createElement("div");
+        proximity.className = "proximity";
+        const details = document.createElement("div");
+        const proximityLabel = document.createElement("span");
+        proximityLabel.className = "proximity-label";
+        proximityLabel.textContent = label.text;
+        const signal = document.createElement("span");
+        signal.className = "signal";
+        signal.setAttribute("aria-hidden", "true");
+        const fill = document.createElement("span");
+        fill.className = "signal-fill";
+        fill.style.width = `${label.width}%`;
+        signal.append(fill);
+        details.append(proximityLabel, signal);
+
+        const signalCaption = document.createElement("span");
+        signalCaption.className = "signal-caption";
+        signalCaption.setAttribute("aria-hidden", "true");
+        signalCaption.textContent = "sinal visual";
+        proximity.append(details, signalCaption);
+
+        item.append(rankBlock, word, proximity);
+        list.prepend(item);
+        emptyState.hidden = true;
+      }
+
+      function setStatus(message, kind = "") {
+        status.textContent = message;
+        status.dataset.kind = kind;
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const guess = normalize(input.value);
+
+        if (!guess) {
+          setStatus("Digite uma palavra antes de enviar.", "error");
+          input.focus();
+          return;
+        }
+
+        if (guesses.has(guess)) {
+          setStatus(`“${guess}” já está no histórico. Tente outra palavra; palpites repetidos não contam.`, "error");
+          input.select();
+          return;
+        }
+
+        const round = rounds[roundIndex];
+        const rank = rankFor(guess, round);
+        guesses.add(guess);
+        addResult(guess, rank);
+        updateCount();
+        input.value = "";
+
+        if (rank === 1) {
+          setStatus(`Você encontrou “${round.answer}” em ${guesses.size} ${guesses.size === 1 ? "palpite" : "palpites"}!`, "success");
+          winMessage.textContent = `A resposta era “${round.answer}”. Você fez ${guesses.size} ${guesses.size === 1 ? "palpite" : "palpites"}.`;
+          winPanel.dataset.visible = "true";
+          input.disabled = true;
+          submitButton.disabled = true;
+          return;
+        }
+
+        const label = labelFor(rank).text;
+        setStatus(`Palpite “${guess}”: posição ${rank.toLocaleString("pt-BR")}, ${label.toLocaleLowerCase("pt-BR")}. Continue tentando.`, "");
+        input.focus();
+      });
+
+      newGameButton.addEventListener("click", () => {
+        roundIndex = (roundIndex + 1) % rounds.length;
+        guesses = new Set();
+        list.replaceChildren();
+        emptyState.hidden = false;
+        input.disabled = false;
+        submitButton.disabled = false;
+        input.value = "";
+        updateCount();
+        winPanel.dataset.visible = "false";
+        setStatus("Nova palavra de prática iniciada. Envie um palpite quando quiser.");
+        input.focus();
+      });
+    })();
+  </script>
+</body>
+</html>

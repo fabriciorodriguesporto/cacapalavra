@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f0e7">
+  <title>CaçaPalavra — propostas de interface</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #17343b;
+      background: #f4f0e7;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; margin: 0; }
+    header, main { width: min(1120px, calc(100% - 32px)); margin-inline: auto; }
+    header { padding: 32px 0 22px; }
+    h1 { margin: 0 0 8px; font: 700 clamp(28px, 5vw, 42px)/1.1 Georgia, serif; }
+    p { max-width: 720px; margin: 0; color: #46565a; line-height: 1.6; }
+    nav { display: flex; flex-wrap: wrap; gap: 10px; padding: 20px 0 16px; }
+    nav button {
+      min-height: 44px;
+      padding: 9px 16px;
+      border: 1px solid #bdc9c2;
+      border-radius: 999px;
+      background: #fffdf8;
+      color: #17343b;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    nav button[aria-pressed="true"] { border-color: #17343b; background: #17343b; color: white; }
+    :focus-visible { outline: 3px solid #bd4f38; outline-offset: 3px; }
+    .frame-wrap { overflow: hidden; border: 1px solid #d3d1c8; border-radius: 16px; background: white; }
+    iframe { display: block; width: 100%; height: min(78vh, 900px); min-height: 650px; border: 0; }
+    .caption { padding: 12px 16px; border-top: 1px solid #ddd8cb; color: #46565a; font-size: 14px; }
+    @media (max-width: 600px) {
+      header { padding-top: 22px; }
+      iframe { height: 78vh; min-height: 580px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CaçaPalavra: três caminhos de interface</h1>
+    <p>Mockups exploratórios para a mesma mecânica: prática ilimitada em português, com ranking semântico, rótulo e feedback visual. Use os botões para alternar entre as propostas.</p>
+  </header>
+  <main>
+    <nav aria-label="Escolher proposta de interface">
+      <button type="button" data-src="01-ux.html" data-caption="01 — UX: fluxo direto, foco no palpite e leitura rápida do progresso." aria-pressed="true">01 · UX e fluxo</button>
+      <button type="button" data-src="02-accessibility.html" data-caption="02 — Acessibilidade: contraste forte, estrutura semântica e operação por teclado." aria-pressed="false">02 · Acessibilidade</button>
+      <button type="button" data-src="03-visual.html" data-caption="03 — Visual: direção de arte editorial e apresentação expressiva da proximidade." aria-pressed="false">03 · Direção visual</button>
+    </nav>
+    <section class="frame-wrap" aria-label="Prévia do mockup escolhido">
+      <iframe id="prototype" title="Mockup CaçaPalavra — UX e fluxo" src="01-ux.html"></iframe>
+      <div class="caption" id="caption" aria-live="polite">01 — UX: fluxo direto, foco no palpite e leitura rápida do progresso.</div>
+    </section>
+  </main>
+  <script>
+    const frame = document.querySelector("#prototype");
+    const caption = document.querySelector("#caption");
+    const buttons = [...document.querySelectorAll("nav button")];
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        for (const item of buttons) item.setAttribute("aria-pressed", String(item === button));
+        frame.src = button.dataset.src;
+        frame.title = `Mockup CaçaPalavra — ${button.textContent.trim()}`;
+        caption.textContent = button.dataset.caption;
+      });
+    }
+  </script>
+</body>
+</html>
