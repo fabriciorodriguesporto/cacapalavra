@@ -1,8 +1,9 @@
 {
-  "name": "cacapalavra",
+  "name": "palavra-perto",
   "version": "1.0.0",
   "private": true,
-  "description": "Jogo casual de adivinhacao semantica em portugues",
+  "description": "Jogo casual de adivinhação semântica em português",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "test": "node --test"

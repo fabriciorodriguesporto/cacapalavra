@@ -3,101 +3,152 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f6f4ee">
-  <meta name="description" content="Um jogo casual de palavras. Descubra a resposta por meio de palpites e proximidade semântica.">
-  <title>CaçaPalavra — prática livre</title>
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="description" content="Descubra a palavra secreta com palpites e pistas de proximidade semântica.">
+  <title>Palavra perto — jogo de associação</title>
   <link rel="stylesheet" href="/styles.css">
-  <script src="/app.js" defer></script>
+  <script type="module" src="/app.js"></script>
 </head>
 <body>
-  <div class="page">
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="CaçaPalavra, início">
-        <span class="brand-mark" aria-hidden="true">C</span>
-        <span class="brand-name">CaçaPalavra</span>
+  <a class="skip-link" href="#main">Pular para o jogo</a>
+  <header class="site-header">
+    <div class="shell topbar">
+      <a class="brand" href="/" aria-label="Palavra Perto, início">
+        <span class="brand-mark" aria-hidden="true">≈</span>
+        <span>palavra perto</span>
       </a>
-      <div class="top-meta">
-        <span class="practice-pill">Prática livre</span>
-        <span class="no-account">Sem conta. Sem pressa.</span>
-      </div>
-    </header>
+      <nav class="header-actions" aria-label="Ajuda e estatísticas">
+        <a class="text-link" href="/prototypes/index.html">Protótipos</a>
+        <button class="text-button" id="help-open" type="button">Como jogar?</button>
+        <button class="text-button" id="stats-open" type="button">Estatísticas</button>
+      </nav>
+    </div>
+  </header>
 
-    <main id="main">
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">Um jogo de associações</p>
-        <h1 id="page-title">Chegue mais perto.</h1>
-        <p class="intro-copy">Descubra a palavra secreta com palpites e pistas de significado. Cada tentativa ajuda — e você pode jogar quantas vezes quiser.</p>
-      </section>
+  <main class="shell" id="main">
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Um jogo de associação</p>
+      <h1 id="page-title">Qual palavra está por perto?</h1>
+      <p class="lede">Descubra a palavra secreta testando ideias. Cada palpite mostra o quanto você chegou perto.</p>
+    </section>
 
-      <div class="game-layout">
-        <section class="panel play-panel" aria-label="Partida de prática">
-          <div class="game-topline">
-            <div class="round-name"><span class="round-icon" aria-hidden="true">✳</span><span>Palavra de prática</span></div>
-            <div class="attempt-count" id="attempt-count" aria-live="polite">0 palpites</div>
+    <div class="game-layout">
+      <section class="play-card" aria-labelledby="game-title">
+        <div class="round-top">
+          <div class="mode-tabs" role="group" aria-label="Escolha o modo">
+            <button id="daily-mode" type="button" aria-pressed="true">Desafio do dia</button>
+            <button id="free-mode" type="button" aria-pressed="false">Partida livre</button>
           </div>
+          <p class="round-label" id="round-label"></p>
+        </div>
 
-          <div class="game-body">
-            <p class="prompt-line"><span aria-hidden="true">✦</span>Qual palavra vem à sua cabeça?</p>
-            <p class="prompt-help">Digite uma palavra em português. O ranking mostra o quanto ela se aproxima da resposta.</p>
-            <form class="guess-form" id="guess-form" novalidate>
-              <div class="input-wrap">
-                <label class="sr-only" for="guess-input">Seu palpite</label>
-                <input class="guess-input" id="guess-input" name="guess" type="text" maxlength="48" autocomplete="off" autocapitalize="sentences" placeholder="Ex.: natureza" aria-describedby="input-note">
-              </div>
-              <button class="primary-button" id="submit-button" type="submit">Enviar palpite <span aria-hidden="true">→</span></button>
-            </form>
-            <p class="form-note" id="input-note">Pressione <strong>Enter</strong> para enviar. Tentativas ilimitadas.</p>
-            <button class="retry-button" id="retry-game" type="button" hidden>Tentar carregar uma partida novamente</button>
+        <div class="how-box">
+          <span class="how-icon" aria-hidden="true">i</span>
+          <p><strong>Como funciona:</strong> digite uma palavra. Quanto mais próxima do sentido secreto, menor será sua posição no ranking. <strong>1º lugar é o mais perto.</strong></p>
+        </div>
+
+        <h2 id="game-title">Qual é o seu primeiro palpite?</h2>
+        <form id="guess-form" novalidate>
+          <label for="guess-input">Digite uma palavra</label>
+          <div class="guess-row">
+            <input id="guess-input" name="guess" type="text" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Ex.: uma ideia que vem à cabeça" aria-describedby="input-hint feedback">
+            <button class="primary-button" id="guess-submit" type="submit">Tentar <span aria-hidden="true">→</span></button>
           </div>
+          <p class="input-hint" id="input-hint">Sem pressa: você pode tentar quantas vezes quiser. O jogo reconhece uma seleção de palavras em português; uma palavra não reconhecida não conta como tentativa. Pressione Enter ou selecione Tentar.</p>
+        </form>
+        <p class="feedback" id="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+        <p class="storage-note" id="storage-note" role="status" hidden></p>
+        <button class="text-button reset-storage" id="reset-corrupt" type="button" hidden>Salvar progresso recuperado</button>
 
-          <section class="victory-panel" id="victory-panel" aria-labelledby="victory-title" hidden>
-            <div class="victory-top">
-              <span class="victory-star" aria-hidden="true">✦</span>
-              <div><h2 id="victory-title">Boa! Palavra encontrada.</h2><p id="victory-count">Partida concluída.</p></div>
-            </div>
-            <p class="revealed-answer" id="revealed-answer"></p>
-            <button class="primary-button new-game" id="new-game" type="button">Começar nova partida <span aria-hidden="true">↗</span></button>
-          </section>
+        <div class="progress-summary" aria-label="Progresso da partida">
+          <p><strong id="guess-count">0</strong> palpites feitos</p>
+          <p>Melhor posição: <strong id="best-rank">—</strong></p>
+          <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+        </div>
 
-          <section class="history" aria-labelledby="history-title">
-            <div class="history-head">
-              <h2 id="history-title">Seus palpites</h2>
-              <span class="sort-note">Mais recente primeiro</span>
-            </div>
-            <ol class="history-list" id="history-list" aria-label="Histórico de palpites"></ol>
-            <p class="empty-state" id="empty-state"><strong>Seu histórico começa aqui.</strong><br>Envie um palpite para ver o ranking e acompanhar sua descoberta.</p>
-            <div class="history-foot"><span aria-hidden="true">♧</span>Palpites repetidos não entram duas vezes no histórico.</div>
-          </section>
+        <section class="win-panel" id="win-panel" aria-labelledby="win-title" hidden>
+          <span class="win-mark" aria-hidden="true">✓</span>
+          <div>
+            <h3 id="win-title">Você encontrou!</h3>
+            <p>A palavra era <strong id="answer-word"></strong>. Quer guardar o resultado sem revelar a resposta?</p>
+          </div>
+          <button class="secondary-button" id="share-button" type="button">Compartilhar resultado</button>
         </section>
 
-        <aside class="side-column" aria-label="Ajuda para jogar">
-          <section class="panel guide-panel" aria-labelledby="guide-title">
-            <div class="card-heading"><span class="card-icon" aria-hidden="true">↗</span><h2 id="guide-title">Como funciona</h2></div>
-            <p class="guide-copy">Cada palavra recebe uma posição no ranking. <strong>Quanto menor o número, mais perto do significado.</strong> A resposta certa fica em 1º lugar. Pense em ideias relacionadas, não em letras.</p>
-            <div class="rank-key" aria-label="Faixas ilustrativas do ranking">
-              <div class="key-row"><span class="key-swatch close" aria-hidden="true"></span><span>1 · Resposta encontrada</span></div>
-              <div class="key-row"><span class="key-swatch warm" aria-hidden="true"></span><span>2–15 · Muito perto ou quente</span></div>
-              <div class="key-row"><span class="key-swatch mild" aria-hidden="true"></span><span>16–30 · Morno</span></div>
-              <div class="key-row"><span class="key-swatch far" aria-hidden="true"></span><span>31+ · Distante</span></div>
-            </div>
-          </section>
+        <button class="text-button restart-button" id="restart-free" type="button" hidden>Começar outra partida livre</button>
+      </section>
 
-          <section class="panel examples-panel" aria-labelledby="examples-title">
-            <div class="card-heading"><span class="card-icon" aria-hidden="true">▤</span><h2 id="examples-title">Experimente</h2></div>
-            <p class="examples-intro">O vocabulário inicial é curado. Toque num exemplo para testar o ranking.</p>
-            <div class="example-list">
-              <button class="example-chip" type="button" data-guess="floresta">floresta</button>
-              <button class="example-chip" type="button" data-guess="água">água</button>
-              <button class="example-chip" type="button" data-guess="amizade">amizade</button>
-              <button class="example-chip" type="button" data-guess="melodia">melodia</button>
-              <button class="example-chip" type="button" data-guess="natureza">natureza</button>
-            </div>
-          </section>
-        </aside>
-      </div>
-      <p class="footer-note"><span aria-hidden="true">♧</span>Jogue no seu ritmo. Sem limite de palpites, sem cronômetro e sem cadastro.</p>
-      <p class="sr-only" id="live-message" aria-live="polite" aria-atomic="true"></p>
-    </main>
-  </div>
+      <section class="history-card" aria-labelledby="history-title">
+        <div class="history-heading">
+          <div>
+            <p class="eyebrow">Seu histórico</p>
+            <h2 id="history-title">Seus palpites</h2>
+          </div>
+          <span class="count" id="history-count">0 palavras</span>
+        </div>
+        <p class="history-help">Ranking = posição entre as palavras mais próximas. Número menor significa mais perto.</p>
+        <label class="sort-control" for="sort-order">Mostrar por
+          <select id="sort-order">
+            <option value="nearest">mais próximos</option>
+            <option value="attempt">ordem de tentativa</option>
+          </select>
+        </label>
+        <ol class="guess-list" id="guess-list" aria-label="Histórico de palpites"></ol>
+        <p class="empty-state" id="empty-state">Seus palpites aparecem aqui. Comece com qualquer palavra que vier à cabeça.</p>
+        <div class="hint" id="hint" hidden>
+          <span aria-hidden="true">✦</span>
+          <p><strong>Uma pista:</strong> seu palpite mais próximo pode ajudar a pensar na próxima associação.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p>Sem cronômetro, sem limite. Jogue no seu ritmo.</p>
+      <p>Seu progresso fica neste navegador.</p>
+    </div>
+  </footer>
+
+  <dialog class="dialog" id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-heading">
+      <div><p class="eyebrow">Guia rápido</p><h2 id="help-title">Como jogar</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="Fechar ajuda">×</button>
+    </div>
+    <ol class="rules-list">
+      <li>Digite uma palavra em português e envie seu palpite.</li>
+      <li>O jogo mostra a posição no ranking semântico: posição <strong>1</strong> significa a associação mais próxima da palavra secreta.</li>
+      <li>Use os palpites mais próximos para explorar novas ideias. Não há cronômetro nem limite de tentativas.</li>
+      <li>O catálogo inicial reconhece uma seleção de palavras; palavras não reconhecidas não contam como tentativa.</li>
+    </ol>
+    <button class="primary-button dialog-done" type="button" data-close-dialog>Entendi</button>
+  </dialog>
+
+  <dialog class="dialog" id="stats-dialog" aria-labelledby="stats-title">
+    <div class="dialog-heading">
+      <div><p class="eyebrow">Neste navegador</p><h2 id="stats-title">Suas estatísticas</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="Fechar estatísticas">×</button>
+    </div>
+    <dl class="stats-grid">
+      <div><dt>Desafios concluídos</dt><dd id="stat-played">0</dd></div>
+      <div><dt>Vitórias</dt><dd id="stat-wins">0</dd></div>
+      <div><dt>Sequência atual</dt><dd id="stat-current-streak">0</dd></div>
+      <div><dt>Melhor sequência</dt><dd id="stat-best-streak">0</dd></div>
+    </dl>
+    <h3>Palpites até encontrar</h3>
+    <ol class="distribution-list" id="distribution-list"></ol>
+    <p class="dialog-note">As estatísticas são salvas apenas neste navegador. Não há conta nem envio de dados.</p>
+  </dialog>
+
+  <dialog class="dialog" id="share-dialog" aria-labelledby="share-title">
+    <div class="dialog-heading">
+      <div><p class="eyebrow">Sem spoiler</p><h2 id="share-title">Copie seu resultado</h2></div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="Fechar compartilhamento">×</button>
+    </div>
+    <label for="share-text">Resumo sem a palavra secreta</label>
+    <textarea id="share-text" rows="4" readonly></textarea>
+    <p class="dialog-note">O resumo não inclui a resposta nem as palavras que você tentou. Selecione o texto e copie para compartilhar.</p>
+    <button class="primary-button dialog-done" type="button" id="select-share-text">Selecionar texto</button>
+  </dialog>
 </body>
 </html>

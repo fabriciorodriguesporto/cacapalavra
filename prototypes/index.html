@@ -3,74 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f0e7">
-  <title>CaçaPalavra — propostas de interface</title>
+  <meta name="color-scheme" content="light">
+  <title>Protótipos — jogo de adivinhação</title>
   <style>
-    :root {
-      color-scheme: light;
-      font-family: "Segoe UI", Arial, sans-serif;
-      color: #17343b;
-      background: #f4f0e7;
-      font-synthesis: none;
-    }
+    :root { font-family: "Segoe UI", sans-serif; color: #172126; background: #f4f2ec; }
     * { box-sizing: border-box; }
-    body { min-width: 320px; margin: 0; }
-    header, main { width: min(1120px, calc(100% - 32px)); margin-inline: auto; }
-    header { padding: 32px 0 22px; }
-    h1 { margin: 0 0 8px; font: 700 clamp(28px, 5vw, 42px)/1.1 Georgia, serif; }
-    p { max-width: 720px; margin: 0; color: #46565a; line-height: 1.6; }
-    nav { display: flex; flex-wrap: wrap; gap: 10px; padding: 20px 0 16px; }
-    nav button {
-      min-height: 44px;
-      padding: 9px 16px;
-      border: 1px solid #bdc9c2;
-      border-radius: 999px;
-      background: #fffdf8;
-      color: #17343b;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    nav button[aria-pressed="true"] { border-color: #17343b; background: #17343b; color: white; }
-    :focus-visible { outline: 3px solid #bd4f38; outline-offset: 3px; }
-    .frame-wrap { overflow: hidden; border: 1px solid #d3d1c8; border-radius: 16px; background: white; }
-    iframe { display: block; width: 100%; height: min(78vh, 900px); min-height: 650px; border: 0; }
-    .caption { padding: 12px 16px; border-top: 1px solid #ddd8cb; color: #46565a; font-size: 14px; }
-    @media (max-width: 600px) {
-      header { padding-top: 22px; }
-      iframe { height: 78vh; min-height: 580px; }
-    }
+    body { max-width: 72rem; margin: 0 auto; padding: 2rem 1rem; line-height: 1.55; }
+    h1 { font-family: Georgia, serif; font-size: clamp(2rem, 7vw, 4rem); line-height: 1.05; margin: 0 0 .5rem; }
+    .intro { max-width: 44rem; margin-bottom: 2rem; color: #425158; }
+    ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+    li { background: #fffefa; border: 1px solid #788785; padding: 1.25rem; }
+    h2 { margin: 0 0 .5rem; font-size: 1.2rem; }
+    p { margin: 0 0 1rem; }
+    a { color: #064f71; font-weight: 700; text-underline-offset: .2em; }
+    a:focus-visible { outline: 3px solid #8a3100; outline-offset: 4px; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>CaçaPalavra: três caminhos de interface</h1>
-    <p>Mockups exploratórios para a mesma mecânica: prática ilimitada em português, com ranking semântico, rótulo e feedback visual. Use os botões para alternar entre as propostas.</p>
-  </header>
   <main>
-    <nav aria-label="Escolher proposta de interface">
-      <button type="button" data-src="01-ux.html" data-caption="01 — UX: fluxo direto, foco no palpite e leitura rápida do progresso." aria-pressed="true">01 · UX e fluxo</button>
-      <button type="button" data-src="02-accessibility.html" data-caption="02 — Acessibilidade: contraste forte, estrutura semântica e operação por teclado." aria-pressed="false">02 · Acessibilidade</button>
-      <button type="button" data-src="03-visual.html" data-caption="03 — Visual: direção de arte editorial e apresentação expressiva da proximidade." aria-pressed="false">03 · Direção visual</button>
-    </nav>
-    <section class="frame-wrap" aria-label="Prévia do mockup escolhido">
-      <iframe id="prototype" title="Mockup CaçaPalavra — UX e fluxo" src="01-ux.html"></iframe>
-      <div class="caption" id="caption" aria-live="polite">01 — UX: fluxo direto, foco no palpite e leitura rápida do progresso.</div>
-    </section>
+    <p>PAINEL DE DESIGN · 22 OUT 2026</p>
+    <h1>Três caminhos para o jogo</h1>
+    <p class="intro">Compare as propostas feitas pelos especialistas de UX, acessibilidade e design visual. Cada link abre uma demonstração interativa; escolha uma direção para orientar o documento técnico e a implementação.</p>
+    <ol>
+      <li>
+        <h2>01 · Palavra perto — UX</h2>
+        <p>Fluxo guiado e caloroso, foco no primeiro palpite e histórico comparável.</p>
+        <a href="./01-ux.html">Abrir protótipo de UX</a>
+      </li>
+      <li>
+        <h2>02 · Palavra por perto — acessibilidade</h2>
+        <p>Interface editorial e text-first, com hierarquia e instruções explícitas de ranking.</p>
+        <a href="./02-accessibility.html">Abrir protótipo acessível</a>
+      </li>
+      <li>
+        <h2>03 · Entrelinhas — visual</h2>
+        <p>Identidade marcante em azul e lima, composição geométrica e linguagem de “mapa”.</p>
+        <a href="./03-visual.html">Abrir protótipo visual</a>
+      </li>
+    </ol>
   </main>
-  <script>
-    const frame = document.querySelector("#prototype");
-    const caption = document.querySelector("#caption");
-    const buttons = [...document.querySelectorAll("nav button")];
-
-    for (const button of buttons) {
-      button.addEventListener("click", () => {
-        for (const item of buttons) item.setAttribute("aria-pressed", String(item === button));
-        frame.src = button.dataset.src;
-        frame.title = `Mockup CaçaPalavra — ${button.textContent.trim()}`;
-        caption.textContent = button.dataset.caption;
-      });
-    }
-  </script>
 </body>
 </html>

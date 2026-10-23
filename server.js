@@ -1,13 +1,11 @@
-"use strict";
+import { createServer as createHttpServer } from "node:http";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const http = require("node:http");
-const fs = require("node:fs");
-const path = require("node:path");
-const { createGame, gameSnapshot, submitGuess } = require("./src/game");
-
-const publicDirectory = path.join(__dirname, "public");
-const maxRetainedGames = 1000;
-const gameRetentionMs = 30 * 24 * 60 * 60 * 1000;
+const projectDirectory = path.dirname(fileURLToPath(import.meta.url));
+const publicDirectory = path.join(projectDirectory, "public");
+const prototypesDirectory = path.join(projectDirectory, "prototypes");
 const mimeTypes = new Map([
   [".css", "text/css; charset=utf-8"],
   [".html", "text/html; charset=utf-8"],
@@ -17,183 +15,90 @@ const mimeTypes = new Map([
   [".svg", "image/svg+xml"]
 ]);
 
-function sendJson(response, statusCode, body) {
+function sendText(response, statusCode, message) {
   response.writeHead(statusCode, {
     "Cache-Control": "no-store",
-    "Content-Type": "application/json; charset=utf-8",
+    "Content-Type": "text/plain; charset=utf-8",
     "X-Content-Type-Options": "nosniff"
   });
-  response.end(JSON.stringify(body));
+  response.end(message);
 }
 
-function pruneGames(games, now = Date.now(), reserveSlot = false) {
-  for (const [gameId, game] of games) {
-    if (now - game.createdAt > gameRetentionMs) games.delete(gameId);
-  }
-
-  const targetSize = maxRetainedGames - Number(reserveSlot);
-  if (games.size <= targetSize) return;
-
-  const oldestFirst = [...games.entries()].sort((left, right) => left[1].createdAt - right[1].createdAt);
-  for (const [gameId] of oldestFirst) {
-    if (games.size <= targetSize) break;
-    games.delete(gameId);
-  }
-}
-
-async function readJson(request) {
-  const chunks = [];
-  let size = 0;
-
-  for await (const chunk of request) {
-    size += chunk.length;
-    if (size > 4096) {
-      const error = new Error("O corpo da solicitação excede o tamanho permitido.");
-      error.statusCode = 413;
-      throw error;
-    }
-    chunks.push(chunk);
-  }
-
-  if (size === 0) return {};
-  let body;
-  try {
-    body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    const error = new Error("O corpo da solicitação deve conter JSON válido.");
-    error.statusCode = 400;
-    throw error;
-  }
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    const error = new Error("O corpo da solicitação deve ser um objeto JSON.");
-    error.statusCode = 400;
-    throw error;
-  }
-  return body;
-}
-
-async function serveStatic(request, response, pathname) {
-  const requestedPath = pathname === "/" ? "index.html" : pathname.slice(1);
-  const filePath = path.resolve(publicDirectory, requestedPath);
-  const relativePath = path.relative(publicDirectory, filePath);
-
+async function serveFile(response, baseDirectory, requestedPath, method, isPrototype, readFileImplementation) {
+  const filePath = path.resolve(baseDirectory, requestedPath);
+  const relativePath = path.relative(baseDirectory, filePath);
   if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
-    sendJson(response, 404, { error: "NOT_FOUND", message: "Página não encontrada." });
+    sendText(response, 404, "Página não encontrada.");
     return;
   }
 
+  const contentType = mimeTypes.get(path.extname(filePath).toLowerCase());
+  if (!contentType) {
+    sendText(response, 404, "Arquivo não encontrado.");
+    return;
+  }
+
+  let contents;
   try {
-    const file = await fs.promises.readFile(filePath);
-    const contentType = mimeTypes.get(path.extname(filePath).toLowerCase());
-    if (!contentType) {
-      sendJson(response, 404, { error: "NOT_FOUND", message: "Arquivo não encontrado." });
-      return;
-    }
-    response.writeHead(200, {
-      "Cache-Control": "no-cache",
-      "Content-Security-Policy": "default-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'",
-      "Content-Type": contentType,
-      "Referrer-Policy": "same-origin",
-      "X-Content-Type-Options": "nosniff"
-    });
-    response.end(file);
+    contents = await readFileImplementation(filePath);
   } catch (error) {
-    if (error.code === "ENOENT" || error.code === "EISDIR") {
-      sendJson(response, 404, { error: "NOT_FOUND", message: "Página não encontrada." });
+    if (error.code === "ENOENT" || error.code === "EISDIR" || error.code === "ENOTDIR") {
+      sendText(response, 404, "Página não encontrada.");
       return;
     }
     throw error;
   }
+
+  response.writeHead(200, {
+    "Cache-Control": "no-cache",
+    "Content-Security-Policy": isPrototype
+      ? "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'"
+      : "default-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'",
+    "Content-Type": contentType,
+    "Referrer-Policy": "same-origin",
+    "X-Content-Type-Options": "nosniff"
+  });
+  response.end(method === "HEAD" ? undefined : contents);
 }
 
-function createServer() {
-  const games = new Map();
-
-  return http.createServer(async (request, response) => {
-    try {
-      pruneGames(games);
-      const url = new URL(request.url, "http://localhost");
-      const pathname = decodeURIComponent(url.pathname);
-
-      if (pathname === "/api/health" && request.method === "GET") {
-        sendJson(response, 200, { status: "ok" });
-        return;
-      }
-
-      if (pathname === "/api/games" && request.method === "POST") {
-        const body = await readJson(request);
-        const previousGame = typeof body.previousGameId === "string"
-          ? games.get(body.previousGameId)
-          : null;
-        pruneGames(games, Date.now(), true);
-        const game = createGame({ excludeAnswer: previousGame?.answer ?? null });
-        games.set(game.id, game);
-        sendJson(response, 201, {
-          gameId: game.id,
-          language: "pt-BR",
-          rulesVersion: 1
-        });
-        return;
-      }
-
-      const gameRoute = pathname.match(/^\/api\/games\/([0-9a-f-]+)(?:\/(guesses))?$/iu);
-      if (gameRoute) {
-        const game = games.get(gameRoute[1]);
-        if (!game) {
-          sendJson(response, 404, { error: "GAME_NOT_FOUND", message: "Esta partida não está mais disponível." });
-          return;
-        }
-
-        if (gameRoute[2] === "guesses" && request.method === "POST") {
-          const body = await readJson(request);
-          const result = submitGuess(game, body.guess);
-          if (!result.ok) {
-            sendJson(response, result.statusCode, {
-              error: result.error,
-              message: result.message
-            });
-            return;
-          }
-          sendJson(response, 200, {
-            duplicate: result.duplicate,
-            guess: result.guess,
-            game: gameSnapshot(game)
-          });
-          return;
-        }
-
-        if (!gameRoute[2] && request.method === "GET") {
-          sendJson(response, 200, gameSnapshot(game));
-          return;
-        }
-      }
-
-      if (pathname.startsWith("/api/")) {
-        sendJson(response, 404, { error: "NOT_FOUND", message: "Recurso não encontrado." });
-        return;
-      }
-      if (request.method !== "GET" && request.method !== "HEAD") {
-        sendJson(response, 405, { error: "METHOD_NOT_ALLOWED", message: "Método não permitido." });
-        return;
-      }
-      await serveStatic(request, response, pathname);
-    } catch (error) {
-      if (error.statusCode) {
-        sendJson(response, error.statusCode, { error: "INVALID_REQUEST", message: error.message });
-        return;
-      }
+export function createServer({ readFileImplementation = readFile } = {}) {
+  return createHttpServer((request, response) => {
+    handleRequest(request, response, readFileImplementation).catch((error) => {
       console.error("Falha ao processar solicitação:", error);
-      sendJson(response, 500, { error: "INTERNAL_ERROR", message: "Não foi possível concluir a solicitação." });
-    }
+      if (response.headersSent) {
+        response.destroy();
+        return;
+      }
+      sendText(response, 500, "Não foi possível carregar a página.");
+    });
   });
 }
 
-if (require.main === module) {
+async function handleRequest(request, response, readFileImplementation) {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      sendText(response, 405, "Método não permitido.");
+      return;
+    }
+
+    let pathname;
+    try {
+      pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
+    } catch {
+      sendText(response, 400, "Endereço inválido.");
+      return;
+    }
+
+    const isPrototype = pathname.startsWith("/prototypes/");
+    const baseDirectory = isPrototype ? prototypesDirectory : publicDirectory;
+    let requestedPath = isPrototype ? pathname.slice("/prototypes/".length) : pathname.slice(1);
+    if (pathname === "/" || requestedPath === "") requestedPath = "index.html";
+    await serveFile(response, baseDirectory, requestedPath, request.method, isPrototype, readFileImplementation);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const server = createServer();
   const port = Number(process.env.PORT || 4173);
   server.listen(port, "127.0.0.1", () => {
-    console.log(`CaçaPalavra disponível em http://127.0.0.1:${port}`);
+    console.log(`Palavra Perto disponível em http://127.0.0.1:${port}`);
   });
 }
-
-module.exports = { createServer, pruneGames };

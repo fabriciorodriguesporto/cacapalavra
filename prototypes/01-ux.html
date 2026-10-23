@@ -3,510 +3,382 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f6f4ee">
-  <title>CaçaPalavra — pratique sem limite</title>
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Palavra perto — protótipo de UX</title>
   <style>
     :root {
       color-scheme: light;
-      --paper: #f6f4ee;
+      --paper: #f7f5ef;
       --surface: #fffefa;
-      --ink: #173d38;
-      --muted: #657873;
-      --line: #e3e8df;
-      --green: #247267;
-      --green-dark: #19594f;
-      --green-pale: #e8f3ed;
-      --yellow: #e9b653;
-      --yellow-pale: #fff2d8;
-      --coral: #d66b50;
-      --coral-pale: #fff0e9;
-      --shadow: 0 14px 40px rgba(29, 62, 53, .07);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-synthesis: none;
-      text-rendering: optimizeLegibility;
+      --ink: #192b26;
+      --muted: #63736d;
+      --line: #dce4dd;
+      --green: #176b51;
+      --green-dark: #10513e;
+      --mint: #e5f3eb;
+      --gold: #f3c85b;
+      --gold-pale: #fff4d2;
+      --coral: #a83d2d;
+      --shadow: 0 12px 30px rgba(25, 43, 38, .07);
     }
-
     * { box-sizing: border-box; }
     body {
-      min-width: 320px;
       margin: 0;
+      background: var(--paper);
       color: var(--ink);
-      background:
-        radial-gradient(ellipse at 8% 0%, rgba(232, 243, 237, .8), transparent 31rem),
-        var(--paper);
+      font-family: ui-rounded, "Avenir Next", "Segoe UI", sans-serif;
+      line-height: 1.5;
     }
     button, input { font: inherit; }
-    button { cursor: pointer; }
-    button:focus-visible, input:focus-visible, a:focus-visible {
-      outline: 3px solid #d66b50;
-      outline-offset: 3px;
+    button { color: inherit; }
+    a { color: inherit; }
+    .skip-link {
+      position: absolute; left: 1rem; top: -5rem; z-index: 5;
+      background: var(--ink); color: white; padding: .7rem 1rem; border-radius: .5rem;
     }
-    .page { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
-    .topbar {
-      min-height: 82px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(23, 61, 56, .09);
-    }
-    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .skip-link:focus { top: 1rem; }
+    :focus-visible { outline: 3px solid #b45716; outline-offset: 3px; }
+    .shell { width: min(100% - 2rem, 960px); margin: 0 auto; }
+    header { padding: 1.1rem 0 .7rem; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: inline-flex; gap: .65rem; align-items: center; text-decoration: none; font-weight: 850; letter-spacing: -.04em; font-size: 1.2rem; }
     .brand-mark {
-      width: 39px; height: 39px; display: grid; place-items: center;
-      border-radius: 13px; color: white; background: var(--green);
-      box-shadow: 0 5px 12px rgba(36, 114, 103, .2);
+      display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
+      border-radius: .8rem; background: var(--green); color: white; font-size: 1.05rem;
     }
-    .brand-mark svg { width: 22px; height: 22px; }
-    .brand-name { font-family: Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 700; letter-spacing: -.8px; }
-    .top-meta { display: flex; align-items: center; gap: 18px; }
-    .practice-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 12px; border: 1px solid #d9e7dd; border-radius: 99px;
-      color: var(--green-dark); background: rgba(255, 254, 250, .7);
-      font-size: 12px; font-weight: 750; letter-spacing: .055em; text-transform: uppercase;
+    .top-actions { display: flex; align-items: center; gap: .45rem; }
+    .text-button {
+      border: 0; background: transparent; padding: .55rem .65rem; border-radius: .55rem;
+      color: var(--green-dark); font-weight: 750; cursor: pointer;
     }
-    .practice-pill::before { width: 7px; height: 7px; border-radius: 50%; background: #54a487; content: ""; }
-    .no-account { color: var(--muted); font-size: 13px; }
-
-    main { padding: 38px 0 52px; }
-    .intro { margin-bottom: 28px; }
-    .eyebrow { margin: 0 0 8px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-    h1, h2, p { margin-top: 0; }
-    h1 { margin-bottom: 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(32px, 4vw, 43px); line-height: 1.08; letter-spacing: -1.1px; }
-    .intro-copy { max-width: 620px; margin-bottom: 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
-    .game-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, .85fr); gap: 22px; align-items: start; }
-    .panel {
-      border: 1px solid rgba(217, 225, 216, .9); border-radius: 18px;
-      background: var(--surface); box-shadow: var(--shadow);
+    .text-button:hover { background: var(--mint); }
+    .prototype-nav {
+      display: flex; flex-wrap: wrap; gap: .35rem; margin-top: 1.05rem;
+      padding: .35rem; background: #eaece5; border-radius: .8rem;
+      width: fit-content; max-width: 100%;
     }
-    .play-panel { overflow: hidden; }
-    .game-topline {
-      display: flex; justify-content: space-between; align-items: center; gap: 14px;
-      padding: 19px 24px; border-bottom: 1px solid var(--line);
+    .prototype-nav a {
+      text-decoration: none; color: #44554e; padding: .4rem .7rem; font-size: .78rem;
+      font-weight: 750; border-radius: .55rem;
     }
-    .round-name { display: flex; align-items: center; gap: 9px; font-weight: 750; font-size: 14px; }
-    .round-icon { color: var(--green); display: grid; place-items: center; }
-    .round-icon svg { width: 19px; height: 19px; }
-    .attempt-count { color: var(--muted); font-size: 13px; white-space: nowrap; }
-    .attempt-count strong { color: var(--ink); }
-    .game-body { padding: 25px 24px 22px; }
-    .prompt-line { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 17px; font-weight: 750; }
-    .prompt-line svg { width: 19px; height: 19px; color: var(--yellow); }
-    .prompt-help { margin-bottom: 19px; color: var(--muted); font-size: 13px; line-height: 1.5; }
-    .guess-form { display: flex; gap: 10px; }
-    .input-wrap { position: relative; flex: 1; min-width: 0; }
-    .input-wrap svg { position: absolute; top: 50%; left: 15px; width: 19px; height: 19px; transform: translateY(-50%); color: #81918a; pointer-events: none; }
-    .guess-input {
-      width: 100%; min-height: 54px; padding: 0 15px 0 44px;
-      border: 1px solid #ccd8ce; border-radius: 11px; color: var(--ink);
-      background: #fff; font-size: 15px; transition: border-color .18s, box-shadow .18s;
+    .prototype-nav a[aria-current="page"] { color: var(--ink); background: white; box-shadow: 0 1px 3px #192b2612; }
+    main { padding: 1.3rem 0 3rem; }
+    .intro { margin-bottom: 1.3rem; }
+    .eyebrow { margin: 0 0 .3rem; color: var(--green); font-size: .72rem; font-weight: 850; letter-spacing: .11em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(1.8rem, 7vw, 2.7rem); line-height: 1.08; letter-spacing: -.055em; }
+    .lede { max-width: 38rem; color: var(--muted); margin: .55rem 0 0; }
+    .game-layout { display: grid; gap: 1rem; }
+    .play-card, .history-card {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 1.2rem;
+      box-shadow: var(--shadow);
     }
-    .guess-input::placeholder { color: #899790; }
-    .guess-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(36, 114, 103, .12); outline: 0; }
+    .play-card { padding: 1.1rem; }
+    .mode-row { display: flex; justify-content: space-between; align-items: center; gap: .6rem; }
+    .mode-tabs { display: inline-flex; gap: .2rem; padding: .25rem; background: #f0f2ed; border-radius: .75rem; }
+    .mode-tabs button {
+      border: 0; padding: .5rem .72rem; background: transparent; color: #586760;
+      border-radius: .55rem; font-weight: 750; font-size: .84rem; cursor: pointer;
+    }
+    .mode-tabs button[aria-pressed="true"] { background: white; color: var(--ink); box-shadow: 0 1px 3px #192b2617; }
+    .round-label { white-space: nowrap; font-size: .75rem; color: var(--muted); font-weight: 700; }
+    .how-box {
+      display: flex; align-items: flex-start; gap: .75rem; margin: 1rem 0 1.15rem;
+      padding: .85rem; border-radius: .8rem; border: 1px solid #d6e9dc; background: #f0f8f2;
+    }
+    .how-icon { display: grid; place-items: center; flex: 0 0 1.7rem; height: 1.7rem; border-radius: .55rem; background: #d6ecdd; color: var(--green-dark); font-weight: 900; }
+    .how-box p { margin: 0; font-size: .88rem; }
+    .how-box strong { color: var(--green-dark); }
+    .prompt { margin: 0 0 .6rem; font-weight: 800; font-size: 1.08rem; }
+    .guess-form { display: flex; gap: .55rem; }
+    .guess-form input {
+      min-width: 0; flex: 1; height: 3.25rem; padding: 0 .9rem; border-radius: .75rem;
+      border: 1.5px solid #b9c8bd; background: white; color: var(--ink);
+    }
+    .guess-form input::placeholder { color: #77857f; }
     .primary-button {
-      display: inline-flex; min-height: 54px; align-items: center; justify-content: center; gap: 9px;
-      padding: 0 19px; border: 0; border-radius: 11px; color: white;
-      background: var(--green); box-shadow: 0 4px 10px rgba(36, 114, 103, .16);
-      font-size: 14px; font-weight: 750; transition: background .18s, transform .18s;
+      min-height: 3.25rem; border: 0; border-radius: .75rem; padding: 0 1.05rem;
+      background: var(--green); color: white; font-weight: 800; cursor: pointer;
+      transition: background .15s ease, transform .15s ease;
     }
     .primary-button:hover { background: var(--green-dark); transform: translateY(-1px); }
-    .primary-button:active { transform: translateY(0); }
-    .primary-button svg { width: 17px; height: 17px; }
-    .form-note { min-height: 20px; margin: 9px 0 0; color: var(--muted); font-size: 12px; }
-    .form-note.error { color: #a3402e; font-weight: 650; }
-    .form-note.success { color: var(--green-dark); font-weight: 650; }
-    .demo-win {
-      margin-top: 7px; padding: 4px 0; border: 0; color: #73817b;
-      background: transparent; font-size: 11px; text-decoration: underline; text-underline-offset: 3px;
+    .feedback { min-height: 1.5rem; margin: .55rem 0 .25rem; font-size: .85rem; color: var(--muted); }
+    .feedback.error { color: var(--coral); font-weight: 750; }
+    .progress-note {
+      display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+      padding: .85rem 0 .25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .83rem;
     }
-    .demo-win:hover { color: var(--green-dark); }
-
-    .history { border-top: 1px solid var(--line); }
-    .history-head { display: flex; justify-content: space-between; align-items: baseline; padding: 17px 24px 12px; }
-    .history-head h2 { margin: 0; font-size: 14px; font-weight: 800; }
-    .sort-note { color: #84918a; font-size: 11px; }
-    .history-list { list-style: none; padding: 0; margin: 0; }
-    .history-row {
-      display: grid; grid-template-columns: minmax(0, 1fr) minmax(95px, 145px) 64px;
-      gap: 12px; align-items: center; padding: 12px 24px; border-top: 1px solid #eff1ec;
-      animation: arrive .24s ease-out both;
+    .progress-note strong { color: var(--ink); }
+    .progress-track { height: .48rem; margin-top: .45rem; background: #e9eee8; border-radius: 9rem; overflow: hidden; }
+    .progress-fill { height: 100%; width: 26%; background: var(--gold); border-radius: inherit; transition: width .35s ease; }
+    .history-card { padding: 1.05rem; }
+    .history-heading { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-bottom: .7rem; }
+    h2 { margin: 0; font-size: 1.05rem; letter-spacing: -.02em; }
+    .count { color: var(--muted); font-size: .78rem; font-weight: 700; }
+    .history-help { margin: 0 0 .7rem; font-size: .8rem; color: var(--muted); }
+    .sort-control {
+      display: flex; align-items: center; gap: .45rem; margin-bottom: .5rem;
+      color: var(--muted); font-size: .78rem; font-weight: 700;
     }
-    @keyframes arrive { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    .guess-word { min-width: 0; overflow-wrap: anywhere; font-weight: 700; font-size: 14px; }
-    .rank-meter { display: flex; align-items: center; gap: 8px; }
-    .meter-dots { display: flex; gap: 3px; }
-    .meter-dots i { width: 7px; height: 7px; border-radius: 50%; background: #e5e9e3; }
-    .meter-dots i.on { background: var(--meter-color, var(--green)); }
-    .rank-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
-    .rank-number { justify-self: end; min-width: 55px; padding: 6px 8px; border-radius: 8px; text-align: center; font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; background: #f0f2ec; }
-    .rank-number.warm { color: #805617; background: var(--yellow-pale); }
-    .rank-number.hot { color: #28634c; background: var(--green-pale); }
-    .rank-number.correct { color: #fff; background: var(--green); }
-    .empty-state { padding: 23px 24px 25px; color: #7b8982; font-size: 13px; line-height: 1.55; }
-    .empty-state strong { color: var(--ink); }
-    .history-foot { display: flex; gap: 8px; align-items: center; padding: 12px 24px 16px; border-top: 1px solid #eff1ec; color: #75847c; font-size: 11px; }
-    .history-foot svg { flex: 0 0 auto; width: 15px; height: 15px; color: var(--green); }
-
-    .side-column { display: grid; gap: 16px; }
-    .guide-panel { padding: 21px; }
-    .card-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
-    .card-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--green); background: var(--green-pale); }
-    .card-icon svg { width: 18px; height: 18px; }
-    .card-heading h2 { margin: 0; font-size: 15px; font-weight: 800; }
-    .guide-copy { margin-bottom: 16px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .guide-copy strong { color: var(--ink); }
-    .rank-key { display: grid; gap: 8px; }
-    .key-row { display: flex; align-items: center; gap: 10px; color: #52645d; font-size: 12px; }
-    .key-swatch { width: 23px; height: 8px; border-radius: 5px; background: #c8d7ce; }
-    .key-swatch.close { background: #75ae8e; }
-    .key-swatch.far { background: #e9b653; }
-    .rank-key .key-row:last-child .key-swatch { background: #e7eae4; }
-    .examples-panel { padding: 20px 21px 18px; }
-    .examples-intro { margin: -5px 0 13px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .example-list { display: flex; flex-wrap: wrap; gap: 8px; }
-    .example-chip {
-      min-height: 34px; padding: 0 11px; border: 1px solid #dce5dc; border-radius: 99px;
-      color: #2c6255; background: #f6faf5; font-size: 12px; font-weight: 700;
-      transition: border-color .16s, background .16s, transform .16s;
+    .sort-control select { border: 1px solid var(--line); border-radius: .5rem; background: white; color: var(--ink); padding: .38rem .5rem; font-weight: 700; }
+    .guess-list { list-style: none; padding: 0; margin: 0; }
+    .guess-item {
+      display: grid; grid-template-columns: minmax(5.4rem, 1fr) minmax(5.6rem, 1.2fr) auto;
+      align-items: center; gap: .6rem; min-height: 3.6rem; border-top: 1px solid #edf0eb;
     }
-    .example-chip:hover { border-color: #9fc8b0; background: #eaf4ec; transform: translateY(-1px); }
-    .example-chip span { margin-left: 5px; color: #6f8078; font-size: 11px; font-weight: 600; }
-    .example-caption { margin: 12px 0 0; color: #84918a; font-size: 11px; }
-
-    .victory-panel {
-      display: none; padding: 22px; border: 1px solid #b9d9c1; border-radius: 15px;
-      background: linear-gradient(135deg, #edf8ef, #fffdf6);
-      animation: arrive .25s ease-out both;
+    .guess-word { min-width: 0; overflow-wrap: anywhere; font-weight: 800; }
+    .rank-meter { height: .48rem; background: #ebeee8; border-radius: 8rem; overflow: hidden; }
+    .rank-meter span { display: block; height: 100%; border-radius: inherit; background: #a8c8ae; }
+    .rank-meter span.warm { background: #efc85c; }
+    .rank-meter span.hot { background: #e98954; }
+    .rank-label { min-width: 4.2rem; text-align: right; font-size: .72rem; line-height: 1.2; color: #56665f; }
+    .rank-label strong { display: block; color: var(--ink); font-size: .91rem; }
+    .guess-list:empty::after { content: "Seus palpites aparecem aqui."; display: block; padding: 1rem 0; color: var(--muted); font-size: .88rem; }
+    .hint { display: flex; gap: .65rem; padding: .75rem; margin-top: .8rem; border-radius: .75rem; background: var(--gold-pale); font-size: .8rem; color: #514323; }
+    .hint span:first-child { font-size: 1rem; }
+    footer { border-top: 1px solid var(--line); padding: 1rem 0 1.5rem; color: var(--muted); font-size: .75rem; }
+    .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; }
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 10; padding: 1rem; display: grid; place-items: center;
+      background: #10221fc2;
     }
-    .victory-panel.visible { display: block; }
-    .victory-top { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
-    .victory-star { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: #fff; background: var(--green); }
-    .victory-star svg { width: 20px; height: 20px; }
-    .victory-top h2 { margin: 0 0 2px; font-family: Georgia, serif; font-size: 21px; }
-    .victory-top p { margin: 0; color: var(--muted); font-size: 12px; }
-    .revealed-answer { margin: 10px 0 17px; font-family: Georgia, serif; font-size: 27px; font-weight: 700; overflow-wrap: anywhere; }
-    .new-game { width: 100%; }
-    .demo-explain { margin: 10px 0 0; color: #64766d; font-size: 11px; line-height: 1.45; }
-    .footer-note { display: flex; justify-content: center; gap: 7px; margin-top: 23px; color: #75847c; text-align: center; font-size: 12px; }
-    .footer-note svg { flex: 0 0 auto; width: 15px; height: 15px; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-
-    @media (max-width: 760px) {
-      .page { width: min(100% - 32px, 560px); }
-      main { padding-top: 29px; }
-      .game-layout { grid-template-columns: 1fr; gap: 16px; }
-      .side-column { grid-template-columns: 1fr 1fr; align-items: stretch; }
-      .guide-panel, .examples-panel { padding: 18px; }
-      .no-account { display: none; }
+    .modal-backdrop[hidden] { display: none; }
+    .modal {
+      width: min(100%, 27rem); background: var(--surface); border-radius: 1.1rem;
+      padding: 1.25rem; box-shadow: 0 20px 70px #0005;
     }
-    @media (max-width: 520px) {
-      .page { width: calc(100% - 28px); }
-      .topbar { min-height: 69px; }
-      .brand-name { font-size: 21px; }
-      .brand-mark { width: 35px; height: 35px; border-radius: 11px; }
-      .practice-pill { padding: 7px 9px; font-size: 10px; }
-      .top-meta { gap: 0; }
-      main { padding-top: 25px; }
-      .intro { margin-bottom: 21px; }
-      .intro-copy { font-size: 14px; }
-      .game-topline { padding: 16px 17px; }
-      .game-body { padding: 21px 17px 17px; }
-      .guess-form { gap: 8px; }
-      .primary-button { padding: 0 13px; }
-      .history-head { padding: 16px 17px 10px; }
-      .history-row { grid-template-columns: minmax(0, 1fr) minmax(74px, 100px) 55px; gap: 7px; padding: 12px 17px; }
-      .meter-dots { gap: 2px; }
-      .meter-dots i { width: 6px; height: 6px; }
-      .rank-label { font-size: 10px; }
-      .rank-number { min-width: 50px; }
-      .empty-state { padding: 20px 17px; }
-      .history-foot { padding: 12px 17px 15px; }
-      .side-column { grid-template-columns: 1fr; }
-      .guide-panel, .examples-panel { padding: 19px; }
+    .modal h2 { font-size: 1.45rem; }
+    .modal p { color: var(--muted); }
+    .example-rank { display: flex; align-items: center; gap: .8rem; padding: .75rem; border: 1px solid var(--line); border-radius: .7rem; background: #fafbf7; }
+    .example-number { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: .7rem; background: var(--gold-pale); font-weight: 900; }
+    .modal-actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
+    @media (min-width: 760px) {
+      header { padding-top: 1.35rem; }
+      main { padding-top: 2rem; }
+      .intro { margin-bottom: 1.7rem; }
+      .game-layout { grid-template-columns: minmax(0, 1.02fr) minmax(20rem, .98fr); align-items: start; gap: 1.15rem; }
+      .play-card, .history-card { padding: 1.35rem; }
+      .how-box { padding: 1rem; }
+      .guess-item { min-height: 3.9rem; }
     }
-    @media (max-width: 365px) {
-      .guess-form { flex-direction: column; }
-      .guess-form .primary-button { width: 100%; }
-      .history-row { grid-template-columns: minmax(0, 1fr) 55px; }
-      .rank-meter { grid-column: 1; grid-row: 2; }
-      .rank-number { grid-column: 2; grid-row: 1 / span 2; }
-      .sort-note { display: none; }
+    @media (max-width: 390px) {
+      .shell { width: min(100% - 1.25rem, 960px); }
+      .play-card, .history-card { padding: .9rem; }
+      .round-label { font-size: .68rem; }
+      .mode-tabs button { padding-inline: .55rem; font-size: .78rem; }
+      .guess-form { gap: .4rem; }
+      .primary-button { padding-inline: .75rem; }
+      .guess-item { grid-template-columns: minmax(4.5rem, 1fr) minmax(4rem, 1fr) auto; gap: .4rem; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header class="topbar">
-      <a class="brand" href="#inicio" aria-label="CaçaPalavra, início">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M4.5 5.5h15v13h-15z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8 10 2 2 4-4m-6 7h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.5 3v5" stroke="#f2c66e" stroke-width="2" stroke-linecap="round"/></svg>
-        </span>
-        <span class="brand-name">CaçaPalavra</span>
+  <a class="skip-link" href="#main">Pular para o jogo</a>
+  <header class="shell">
+    <div class="topbar">
+      <a class="brand" href="#" aria-label="Palavra perto, início">
+        <span class="brand-mark" aria-hidden="true">≈</span>
+        <span>palavra perto</span>
       </a>
-      <div class="top-meta">
-        <span class="practice-pill">Prática livre</span>
-        <span class="no-account">Sem conta. Sem pressa.</span>
+      <div class="top-actions">
+        <button class="text-button" id="help-button" type="button" aria-haspopup="dialog">Como jogar?</button>
+        <button class="text-button" type="button" aria-label="Ver estatísticas">Estatísticas</button>
       </div>
-    </header>
+    </div>
+    <nav class="prototype-nav" aria-label="Outros protótipos">
+      <a href="/prototypes/01-ux.html" aria-current="page">01 · UX</a>
+      <a href="/prototypes/02-accessibility.html">02 · Acessibilidade</a>
+      <a href="/prototypes/03-visual.html">03 · Visual</a>
+    </nav>
+  </header>
 
-    <main id="inicio">
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">Um jogo de associações</p>
-        <h1 id="page-title">Chegue mais perto.</h1>
-        <p class="intro-copy">Descubra a palavra secreta com palpites e pistas de significado. Aqui, cada tentativa ajuda — e você pode jogar quantas vezes quiser.</p>
+  <main class="shell" id="main">
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Um jogo de associação</p>
+      <h1 id="page-title">Qual palavra está<br class="desktop-break"> por perto?</h1>
+      <p class="lede">Descubra a palavra secreta testando ideias. Cada palpite mostra o quanto você chegou perto.</p>
+    </section>
+
+    <div class="game-layout">
+      <section class="play-card" aria-labelledby="play-title">
+        <div class="mode-row">
+          <div class="mode-tabs" role="group" aria-label="Escolha o modo">
+            <button type="button" aria-pressed="true" data-mode="daily">Desafio do dia</button>
+            <button type="button" aria-pressed="false" data-mode="free">Partida livre</button>
+          </div>
+          <span class="round-label" id="round-label">22 out · #296</span>
+        </div>
+
+        <div class="how-box">
+          <span class="how-icon" aria-hidden="true">i</span>
+          <p><strong>Como funciona:</strong> digite qualquer palavra. Quanto mais próxima do sentido secreto, menor será sua posição no ranking. <strong>1º lugar é o mais perto.</strong></p>
+        </div>
+
+        <h2 class="prompt" id="play-title">Qual é o seu primeiro palpite?</h2>
+        <form class="guess-form" id="guess-form">
+          <label for="guess-input" class="skip-link">Digite uma palavra</label>
+          <input id="guess-input" name="guess" type="text" placeholder="Ex.: uma ideia que vem à cabeça" autocomplete="off" maxlength="40">
+          <button class="primary-button" type="submit">Tentar <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="feedback" id="feedback" aria-live="polite">Sem pressa: você pode tentar quantas vezes quiser.</p>
+
+        <div class="progress-note">
+          <span><strong id="guess-count">3</strong> palpites feitos</span>
+          <span id="best-note">Melhor posição: <strong>42º</strong></span>
+        </div>
+        <div class="progress-track" role="img" aria-label="Seu melhor palpite está entre os 5 por cento mais próximos">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
       </section>
 
-      <div class="game-layout">
-        <section class="panel play-panel" aria-label="Partida de prática">
-          <div class="game-topline">
-            <div class="round-name">
-              <span class="round-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.64 5.64l2.12 2.12m8.48 8.48 2.12 2.12m0-12.72-2.12 2.12m-8.48 8.48-2.12 2.12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/></svg></span>
-              <span>Palavra de prática</span>
-            </div>
-            <div class="attempt-count" id="attempt-count"><strong>0</strong> palpites</div>
-          </div>
+      <section class="history-card" aria-labelledby="history-title">
+        <div class="history-heading">
+          <h2 id="history-title">Seus palpites</h2>
+          <span class="count" id="history-count">3 palavras</span>
+        </div>
+        <p class="history-help">Ranking = posição entre as palavras mais próximas. Número menor significa mais perto.</p>
+        <label class="sort-control" for="sort-select">
+          Mostrar por
+          <select id="sort-select">
+            <option value="rank">mais próximos</option>
+            <option value="time">ordem de tentativa</option>
+          </select>
+        </label>
+        <ol class="guess-list" id="guess-list" aria-label="Histórico de palpites"></ol>
+        <div class="hint">
+          <span aria-hidden="true">✦</span>
+          <span><strong>Uma pista:</strong> pense em palavras relacionadas a natureza, cuidado e vida ao ar livre.</span>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer>
+    <div class="shell footer-inner">
+      <span>Sem cronômetro, sem limite. Jogue no seu ritmo.</span>
+      <span>Seu progresso fica neste navegador.</span>
+    </div>
+  </footer>
 
-          <div class="game-body">
-            <p class="prompt-line"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5L12 3Z" fill="currentColor"/><path d="m19 16 .9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9L19 16Z" fill="currentColor"/></svg>Qual palavra vem à sua cabeça?</p>
-            <p class="prompt-help">Digite uma palavra em português. O ranking mostra o quanto ela se aproxima da resposta.</p>
-            <form class="guess-form" id="guess-form" novalidate>
-              <label class="sr-only" for="guess-input">Seu palpite</label>
-              <div class="input-wrap">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                <input class="guess-input" id="guess-input" name="guess" type="text" maxlength="48" autocomplete="off" autocapitalize="sentences" placeholder="Ex.: natureza" aria-describedby="input-note">
-              </div>
-              <button class="primary-button" id="submit-button" type="submit">
-                Enviar palpite
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-            </form>
-            <p class="form-note" id="input-note">Pressione <strong>Enter</strong> para enviar. Tentativas ilimitadas.</p>
-            <button class="demo-win" id="demo-win" type="button">Demonstração: simular acerto com este palpite</button>
-          </div>
-
-          <section class="victory-panel" id="victory-panel" aria-labelledby="victory-title">
-            <div class="victory-top">
-              <span class="victory-star" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m12 3 2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5L12 3Z" fill="currentColor"/><path d="m19 16 .9 2.1L22 19l-2.1.9L19 22l-.9-2.1L16 19l2.1-.9L19 16Z" fill="#f2c66e"/></svg></span>
-              <div><h2 id="victory-title">Boa! Palavra encontrada.</h2><p id="victory-count">Partida concluída.</p></div>
-            </div>
-            <p class="revealed-answer" id="revealed-answer"></p>
-            <button class="primary-button new-game" id="new-game" type="button">Começar nova partida <span aria-hidden="true">↗</span></button>
-            <p class="demo-explain">Nesta demonstração, o palpite atual vira a resposta ao simular o acerto. Na partida real, a resposta só aparece depois de encontrada.</p>
-          </section>
-
-          <section class="history" aria-labelledby="history-title">
-            <div class="history-head">
-              <h2 id="history-title">Seus palpites</h2>
-              <span class="sort-note">Mais recente primeiro</span>
-            </div>
-            <ol class="history-list" id="history-list" aria-label="Histórico de palpites"></ol>
-            <p class="empty-state" id="empty-state"><strong>Seu histórico começa aqui.</strong><br>Envie um palpite para ver o ranking e acompanhar sua descoberta.</p>
-            <div class="history-foot">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18m0-18 7 4v7c0 4-3.1 6.3-7 8-3.9-1.7-7-4-7-8V7l7-4Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Palpites repetidos não entram duas vezes no histórico.
-            </div>
-          </section>
-        </section>
-
-        <aside class="side-column" aria-label="Ajuda para jogar">
-          <section class="panel guide-panel" aria-labelledby="guide-title">
-            <div class="card-heading">
-              <span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M9.7 9a2.4 2.4 0 1 1 4.4 1.3c-.8 1-2.1 1.2-2.1 2.7m0 3v.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-              <h2 id="guide-title">Como funciona</h2>
-            </div>
-            <p class="guide-copy">Cada palavra recebe uma posição no ranking. <strong>Quanto menor o número, mais perto do significado.</strong> A resposta certa fica em 1º lugar. Não é sobre letras: pense em ideias relacionadas.</p>
-            <div class="rank-key" aria-label="Faixas ilustrativas do ranking">
-              <div class="key-row"><span class="key-swatch close" aria-hidden="true"></span><span>1–10 · Muito perto</span></div>
-              <div class="key-row"><span class="key-swatch" aria-hidden="true"></span><span>11–100 · Quente</span></div>
-              <div class="key-row"><span class="key-swatch far" aria-hidden="true"></span><span>101–500 · Morno</span></div>
-              <div class="key-row"><span class="key-swatch" aria-hidden="true"></span><span>501+ · Frio</span></div>
-            </div>
-          </section>
-
-          <section class="panel examples-panel" aria-labelledby="examples-title">
-            <div class="card-heading">
-              <span class="card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21V5.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8m-8 4h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
-              <h2 id="examples-title">Experimente</h2>
-            </div>
-            <p class="examples-intro">Toque em um exemplo para enviar e ver como o ranking funciona.</p>
-            <div class="example-list">
-              <button class="example-chip" type="button" data-guess="floresta">floresta <span>#8</span></button>
-              <button class="example-chip" type="button" data-guess="árvore">árvore <span>#42</span></button>
-              <button class="example-chip" type="button" data-guess="raiz">raiz <span>#318</span></button>
-              <button class="example-chip" type="button" data-guess="folha">folha <span>#1.204</span></button>
-            </div>
-            <p class="example-caption">Resultados ilustrativos · cada partida tem sua própria resposta.</p>
-          </section>
-        </aside>
+  <div class="modal-backdrop" id="help-modal" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description">
+      <p class="eyebrow">É simples assim</p>
+      <h2 id="modal-title">Aprenda com cada palpite</h2>
+      <p id="modal-description">A palavra secreta é comparada pelo significado, não pela escrita. O ranking indica a posição relativa entre as palavras: quanto menor o número, mais perto você está.</p>
+      <div class="example-rank">
+        <span class="example-number">42º</span>
+        <span><strong>Um bom começo</strong><br><small>Está entre as palavras mais próximas.</small></span>
       </div>
-      <p class="footer-note"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v18m0-18 7 4v7c0 4-3.1 6.3-7 8-3.9-1.7-7-4-7-8V7l7-4Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Jogue no seu ritmo. Sem limite de palpites, sem cronômetro e sem cadastro.</p>
-      <p class="sr-only" id="live-message" aria-live="polite" aria-atomic="true"></p>
-    </main>
+      <div class="modal-actions"><button class="primary-button" id="close-help" type="button">Entendi, vamos jogar</button></div>
+    </section>
   </div>
 
   <script>
-    (() => {
-      const form = document.querySelector("#guess-form");
-      const input = document.querySelector("#guess-input");
-      const note = document.querySelector("#input-note");
-      const list = document.querySelector("#history-list");
-      const emptyState = document.querySelector("#empty-state");
-      const attemptCount = document.querySelector("#attempt-count");
-      const victoryPanel = document.querySelector("#victory-panel");
-      const victoryCount = document.querySelector("#victory-count");
-      const revealedAnswer = document.querySelector("#revealed-answer");
-      const liveMessage = document.querySelector("#live-message");
-      const demoWinButton = document.querySelector("#demo-win");
-      const newGameButton = document.querySelector("#new-game");
-      const seen = new Set();
-      const sampleRanks = new Map([
-        ["floresta", 8], ["árvore", 42], ["raiz", 318], ["folha", 1204],
-        ["natureza", 23], ["mata", 17], ["bosque", 11]
-      ]);
-      let guessTotal = 0;
-      let finished = false;
+    const initialGuesses = [
+      { word: "flor", rank: 42, time: 1, label: "bem perto" },
+      { word: "árvore", rank: 318, time: 2, label: "no caminho" },
+      { word: "praia", rank: 1240, time: 3, label: "mais distante" }
+    ];
+    const demoRanks = {
+      jardim: [8, "quase lá"], planta: [26, "bem perto"], natureza: [73, "bem perto"],
+      parque: [115, "no caminho"], cuidado: [205, "no caminho"], verde: [159, "no caminho"],
+      sol: [780, "mais distante"], casa: [1820, "mais distante"], semente: [31, "bem perto"],
+      grama: [54, "bem perto"], horta: [19, "bem perto"], flor: [42, "bem perto"],
+      árvore: [318, "no caminho"], praia: [1240, "mais distante"]
+    };
+    const list = document.querySelector("#guess-list");
+    const form = document.querySelector("#guess-form");
+    const input = document.querySelector("#guess-input");
+    const feedback = document.querySelector("#feedback");
+    let guesses = initialGuesses.slice();
+    let nextTime = 4;
+    let mode = "daily";
 
-      function rankFor(word) {
-        if (sampleRanks.has(word)) return sampleRanks.get(word);
-        let hash = 0;
-        for (const character of word) hash = (hash * 31 + character.codePointAt(0)) % 100000;
-        return 15 + (hash % 4980);
-      }
-
-      function tierFor(rank) {
-        if (rank <= 10) return { label: "Muito perto", dots: 5, color: "#247267", badge: "hot" };
-        if (rank <= 100) return { label: "Quente", dots: 4, color: "#63a47e", badge: "hot" };
-        if (rank <= 500) return { label: "Morno", dots: 3, color: "#d99c37", badge: "warm" };
-        return { label: "Frio", dots: 1, color: "#9ba8a0", badge: "" };
-      }
-
-      function formatRank(rank) {
-        return new Intl.NumberFormat("pt-BR").format(rank);
-      }
-
-      function addGuess(word, rank, isCorrect = false) {
+    function renderGuesses() {
+      const sorted = guesses.slice();
+      if (document.querySelector("#sort-select").value === "rank") sorted.sort((a, b) => a.rank - b.rank);
+      else sorted.sort((a, b) => a.time - b.time);
+      list.innerHTML = "";
+      sorted.forEach((guess) => {
         const item = document.createElement("li");
-        item.className = "history-row";
-        const term = document.createElement("span");
-        term.className = "guess-word";
-        term.textContent = word;
+        item.className = "guess-item";
+        const word = document.createElement("span");
+        word.className = "guess-word";
+        word.textContent = guess.word;
         const meter = document.createElement("span");
         meter.className = "rank-meter";
-        const dots = document.createElement("span");
-        dots.className = "meter-dots";
-        dots.setAttribute("aria-hidden", "true");
-        const tier = tierFor(rank);
-        dots.style.setProperty("--meter-color", isCorrect ? "#fff" : tier.color);
-        for (let index = 0; index < 5; index += 1) {
-          const dot = document.createElement("i");
-          if (index < tier.dots) dot.className = "on";
-          dots.append(dot);
-        }
-        const label = document.createElement("span");
-        label.className = "rank-label";
-        label.textContent = isCorrect ? "Encontrada" : tier.label;
-        meter.append(dots, label);
-        const badge = document.createElement("span");
-        badge.className = `rank-number ${isCorrect ? "correct" : tier.badge}`;
-        badge.textContent = `#${formatRank(rank)}`;
-        badge.setAttribute("aria-label", `posição ${formatRank(rank)}`);
-        item.append(term, meter, badge);
-        list.prepend(item);
-        emptyState.hidden = true;
-        guessTotal += 1;
-        attemptCount.innerHTML = `<strong>${guessTotal}</strong> ${guessTotal === 1 ? "palpite" : "palpites"}`;
-        return tier.label;
-      }
-
-      function announce(message, kind = "") {
-        note.className = `form-note${kind ? ` ${kind}` : ""}`;
-        note.textContent = message;
-        liveMessage.textContent = message;
-      }
-
-      function submitGuess(rawWord) {
-        if (finished) return;
-        const word = rawWord.normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase("pt-BR");
-        if (!word) {
-          announce("Digite uma palavra antes de enviar.", "error");
-          input.focus();
-          return;
-        }
-        if (!/^[\p{L}\p{M}]+(?:[ '-][\p{L}\p{M}]+)*$/u.test(word)) {
-          announce("Use apenas letras, espaços, hífen ou apóstrofo.", "error");
-          input.focus();
-          return;
-        }
-        if (seen.has(word)) {
-          announce("Você já enviou esse palpite. Experimente uma associação diferente.", "error");
-          input.focus();
-          return;
-        }
-        seen.add(word);
-        const rank = rankFor(word);
-        const label = addGuess(word, rank);
-        announce(`“${word}” ficou na posição ${formatRank(rank)}: ${label.toLocaleLowerCase("pt-BR")}. Tente outra associação.`, "success");
-        input.value = "";
+        meter.setAttribute("aria-hidden", "true");
+        const fill = document.createElement("span");
+        const score = Math.max(8, Math.round(100 - Math.log10(guess.rank) * 24));
+        fill.style.width = score + "%";
+        if (guess.rank <= 50) fill.classList.add("hot");
+        else if (guess.rank <= 250) fill.classList.add("warm");
+        meter.append(fill);
+        const rank = document.createElement("span");
+        rank.className = "rank-label";
+        const number = document.createElement("strong");
+        number.textContent = guess.rank + "º";
+        rank.append(number, document.createTextNode(guess.label));
+        item.append(word, meter, rank);
+        list.append(item);
+      });
+      document.querySelector("#guess-count").textContent = guesses.length;
+      document.querySelector("#history-count").textContent = guesses.length + (guesses.length === 1 ? " palavra" : " palavras");
+      const best = Math.min(...guesses.map((guess) => guess.rank));
+      document.querySelector("#best-note").innerHTML = "Melhor posição: <strong>" + best + "º</strong>";
+      document.querySelector("#progress-fill").style.width = Math.max(12, Math.min(88, 86 - Math.log10(best) * 19)) + "%";
+    }
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const word = input.value.trim().replace(/\s+/g, " ");
+      if (!word) {
+        feedback.textContent = "Digite uma palavra para fazer seu palpite.";
+        feedback.className = "feedback error";
         input.focus();
+        return;
       }
-
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        submitGuess(input.value);
+      if (guesses.some((guess) => guess.word.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === word.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase())) {
+        feedback.textContent = "Você já tentou essa palavra. Experimente outra ideia.";
+        feedback.className = "feedback error";
+        input.select();
+        return;
+      }
+      const normalized = word.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      const [rank, label] = demoRanks[normalized] || [Math.floor(360 + Math.random() * 1850), "no caminho"];
+      guesses.push({ word, rank, time: nextTime++, label });
+      renderGuesses();
+      feedback.textContent = rank < 50 ? "Está esquentando! Essa palavra chegou bem perto." : "Palpite registrado. Que outra palavra tem relação com essa ideia?";
+      feedback.className = "feedback";
+      input.value = "";
+      input.focus();
+    });
+    document.querySelector("#sort-select").addEventListener("change", renderGuesses);
+    document.querySelectorAll("[data-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        mode = button.dataset.mode;
+        document.querySelectorAll("[data-mode]").forEach((tab) => tab.setAttribute("aria-pressed", String(tab === button)));
+        document.querySelector("#round-label").textContent = mode === "daily" ? "22 out · #296" : "Partida livre";
+        feedback.textContent = mode === "daily" ? "Desafio do dia: sem pressa, tente quantas vezes quiser." : "Partida livre selecionada. Aqui você pode jogar de novo quando quiser.";
+        feedback.className = "feedback";
       });
-
-      document.querySelectorAll(".example-chip").forEach((chip) => {
-        chip.addEventListener("click", () => submitGuess(chip.dataset.guess));
-      });
-
-      demoWinButton.addEventListener("click", () => {
-        if (finished) return;
-        const word = input.value.normalize("NFC").trim().replace(/\s+/g, " ").toLocaleLowerCase("pt-BR");
-        if (!word) {
-          announce("Digite um palpite para testar a tela de vitória.", "error");
-          input.focus();
-          return;
-        }
-        if (!/^[\p{L}\p{M}]+(?:[ '-][\p{L}\p{M}]+)*$/u.test(word)) {
-          announce("Use apenas letras, espaços, hífen ou apóstrofo.", "error");
-          input.focus();
-          return;
-        }
-        if (seen.has(word)) {
-          announce("Esse palpite já está no histórico. Digite outro para simular o acerto.", "error");
-          input.focus();
-          return;
-        }
-        seen.add(word);
-        addGuess(word, 1, true);
-        finished = true;
-        revealedAnswer.textContent = word;
-        victoryCount.textContent = `Encontrada em ${guessTotal} ${guessTotal === 1 ? "palpite" : "palpites"}.`;
-        victoryPanel.classList.add("visible");
-        form.hidden = true;
-        demoWinButton.hidden = true;
-        announce(`Parabéns! Você encontrou a palavra: ${word}.`, "success");
-        victoryPanel.scrollIntoView({ block: "nearest", behavior: "smooth" });
-        newGameButton.focus();
-      });
-
-      newGameButton.addEventListener("click", () => {
-        list.replaceChildren();
-        seen.clear();
-        guessTotal = 0;
-        finished = false;
-        attemptCount.innerHTML = "<strong>0</strong> palpites";
-        emptyState.hidden = false;
-        victoryPanel.classList.remove("visible");
-        form.hidden = false;
-        demoWinButton.hidden = false;
-        input.value = "";
-        announce("Nova partida pronta. Qual será seu primeiro palpite?");
-        input.focus();
-      });
-    })();
+    });
+    const modal = document.querySelector("#help-modal");
+    document.querySelector("#help-button").addEventListener("click", () => {
+      modal.hidden = false;
+      document.querySelector("#close-help").focus();
+    });
+    document.querySelector("#close-help").addEventListener("click", () => {
+      modal.hidden = true;
+      document.querySelector("#help-button").focus();
+    });
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.hidden = true;
+        document.querySelector("#help-button").focus();
+      }
+    });
+    renderGuesses();
   </script>
 </body>
 </html>
